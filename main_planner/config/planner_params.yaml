@@ -1,0 +1,6 @@
+point_tolerance: 0.05
+top_speed: 1
+min_speed: 0.2
+cte_speed: 0.4
+Kp_dist: 0.6
+Kd_dist: 0.3

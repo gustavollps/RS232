@@ -1,0 +1,6 @@
+<launch>
+<node name="map_server" pkg="map_server" type="map_server" args="/home/tony/catkin_ws/src/tcc/main_planner/config/map_load.yaml"/>
+<node name="map_server_inflated" pkg="map_server" type="map_server" args="/home/tony/catkin_ws/src/tcc/main_planner/config/map_load_inflated.yaml">
+  <remap from="/map" to="/map_inflated"/>
+</node>
+</launch>

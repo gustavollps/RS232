@@ -1,0 +1,6 @@
+<!--xml-->
+<launch>  
+  <node name="Heading" pkg="heading" type="heading_ekf" output="screen">
+    <rosparam file="$(find heading)/config/heading_ekf_params.yaml" command="load"/>
+  </node>
+</launch>

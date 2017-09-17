@@ -1,0 +1,5 @@
+<launch>
+  <node name="Movement_controller" pkg="movement_controller" type="movement_controller" output="screen">
+    <rosparam file="$(find movement_controller)/config/planner_params.yaml" command="load"/>
+  </node>
+</launch>

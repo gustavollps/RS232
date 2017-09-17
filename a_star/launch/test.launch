@@ -1,0 +1,4 @@
+<!--xml-->
+<launch>
+  <node name="a_star" pkg="a_star_test" type="a_star"/>
+</launch>

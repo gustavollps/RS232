@@ -1,0 +1,5 @@
+<launch>
+  <node name="Control_Loop" pkg="control_loop" type="control_loop" output="screen">
+    <rosparam file="$(find control_loop)/config/control_params.yaml" command="load"/>
+  </node>
+</launch>

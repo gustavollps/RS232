@@ -1,0 +1,57 @@
+M1_P1: 0.5
+M1_I1: 1.5
+M1_D1: 0.0
+
+M1_P2: 0.5
+M1_I2: 1.5
+M1_D2: 0.0
+
+M1_P3: 0.5
+M1_I3: 1.5
+M1_D3: 0.0
+
+M1_Threshold1: 5
+M1_Threshold2: 500
+M1_offset: 20
+M1_deadzone: 50
+
+
+M2_P1: 0.5
+M2_I1: 1.5
+M2_D1: 0.0
+
+M2_P2: 0.5
+M2_I2: 1.5
+M2_D2: 0.0
+
+M2_P3: 0.5
+M2_I3: 1.5
+M2_D3: 0.0
+
+M2_Threshold1: 5
+M2_Threshold2: 500
+M2_offset: 20
+M2_deadzone: 50
+
+M3_P1: 0.5
+M3_I1: 1.5
+M3_D1: 0.0
+
+M3_P2: 0.5
+M3_I2: 1.5
+M3_D2: 0.0
+
+M3_P3: 0.5
+M3_I3: 1.5
+M3_D3: 0.0
+
+M3_Threshold1: 5
+M3_Threshold2: 500
+M3_offset: 20
+M3_deadzone: 50
+
+startup_delay: 8
+
+ENCODER_PULSE_PER_METER: 12000
+
+Velocity_Controller: 1

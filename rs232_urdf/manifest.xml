@@ -1,0 +1,6 @@
+<package>
+  <description brief="rs232_urdf">rs232_urdf</description>
+  <depend package="gazebo" />
+  <author>me</author>
+  <license>BSD</license>
+</package>
