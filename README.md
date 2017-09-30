@@ -3,7 +3,8 @@
 omnidirectional low cost robot firmware
 
 #install:
-fisrt, compile the custom msgs package, so the other packages can compile correctly:
+
+first, compile the custom msgs package, so the other packages can compile correctly:
 
 catkin_make --pkg tcc_msgs
 
