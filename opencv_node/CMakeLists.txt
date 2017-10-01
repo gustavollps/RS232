@@ -17,6 +17,11 @@ add_service_files(
   SetParams.srv
 ) 
 
+add_message_files(
+    FILES
+    color.msg
+)
+
 generate_messages(
    DEPENDENCIES
    std_msgs
