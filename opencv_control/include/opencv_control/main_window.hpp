@@ -57,6 +57,12 @@ public Q_SLOTS:
     *******************************************/
     //void updateLoggingView(); // no idea why this can't connect automatically
   void on_bottom1_sliderMoved(int position);
+  void on_bottom2_sliderMoved(int position);
+  void on_bottom3_sliderMoved(int position);
+  void on_top1_sliderMoved(int position);
+  void on_top2_sliderMoved(int position);
+  void on_top3_sliderMoved(int position);
+
 
 private:
 	Ui::MainWindowDesign ui;

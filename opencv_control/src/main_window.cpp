@@ -163,6 +163,31 @@ void MainWindow::on_bottom1_sliderMoved(int position)
     qnode.b_1 = position;
 }
 
+void MainWindow::on_bottom2_sliderMoved(int position)
+{
+    qnode.b_2 = position;
+}
+
+void MainWindow::on_bottom3_sliderMoved(int position)
+{
+    qnode.b_3 = position;
+}
+
+void MainWindow::on_top1_sliderMoved(int position)
+{
+    qnode.t_1 = position;
+}
+
+void MainWindow::on_top2_sliderMoved(int position)
+{
+    qnode.t_2 = position;
+}
+
+void MainWindow::on_top3_sliderMoved(int position)
+{
+    qnode.t_3 = position;
+}
+
 
 
 }  // namespace opencv_control

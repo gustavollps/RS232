@@ -37,19 +37,18 @@ CamVision::~CamVision(){}
  *	Find objetcs of a specific color and returns a vector with them
  */
 //----------------------------------------------------------------------------------------------------------
-vector<Object> CamVision::findObjects(
-							cv::Mat cameraFeed, 
+vector<Object> CamVision::findObjects(							
 							cv::Scalar top_boundarie, 
 							cv::Scalar bottom_boundarie 
 							)
 {
-
-	capture_.read(cameraFeed);
+  cv::Mat cameraFeed;
+  capture_>>cameraFeed;
 	
-	cameraFeed.copyTo(raw_image_);
+  //cameraFeed.copyTo(raw_image_);
 
-	cv::imshow("RAW",cameraFeed);
-	cv::waitKey(1);
+  //cv::imshow("RAW",cameraFeed);
+  //cv::waitKey(1);
 	
 	vector <Object> tracked;
 
@@ -58,16 +57,22 @@ vector<Object> CamVision::findObjects(
 
 
 
-  cameraFeed.copyTo(threshold_);
+  //cameraFeed.copyTo(threshold_);
 
-  CamVision::gaussianFilter(threshold_);
+  CamVision::gaussianFilter(cameraFeed);
 
-  inRange(threshold_,bottom_boundarie,top_boundarie,threshold_);
 
-  CamVision::filterMat(threshold_);
+  cv::imshow("RAW",cameraFeed);
+  cv::waitKey(1);
+
+  cv::inRange(cameraFeed,bottom_boundarie,top_boundarie,threshold_);
+  ROS_INFO("Filtrou aqui ");
+
+  //CamVision::filterMat(threshold_);
 
   cv::imshow("Image_filtered",threshold_);
   cv::waitKey(1);
+
 
   cv::findContours(threshold_,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
 

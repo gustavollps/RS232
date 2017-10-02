@@ -59,7 +59,7 @@ int main(int argc, char** argv)
   while (ros::ok())
   {
 
-    img_processor.findObjects(cameraFeed, top_color, bottom_color);
+    img_processor.findObjects(top_color, bottom_color);
 
     img_processor.setFilters(service_manager::param_erode,
                              service_manager::param_dilate,

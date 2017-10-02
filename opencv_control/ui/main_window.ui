@@ -14,7 +14,7 @@
    <string>QRosApp</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../joints_control/resources/images.qrc">
+   <iconset resource="../../../serial_control/resources/images.qrc">
     <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
   </property>
   <property name="locale">
@@ -67,6 +67,9 @@
       </item>
       <item>
        <widget class="QSlider" name="bottom3">
+        <property name="maximum">
+         <number>255</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -97,6 +100,12 @@
       </item>
       <item>
        <widget class="QSlider" name="top1">
+        <property name="maximum">
+         <number>255</number>
+        </property>
+        <property name="value">
+         <number>255</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -111,6 +120,12 @@
       </item>
       <item>
        <widget class="QSlider" name="top2">
+        <property name="maximum">
+         <number>255</number>
+        </property>
+        <property name="value">
+         <number>255</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -125,6 +140,12 @@
       </item>
       <item>
        <widget class="QSlider" name="top3">
+        <property name="maximum">
+         <number>255</number>
+        </property>
+        <property name="value">
+         <number>255</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -403,7 +424,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../../../joints_control/resources/images.qrc"/>
+  <include location="../../../serial_control/resources/images.qrc"/>
  </resources>
  <connections>
   <connection>

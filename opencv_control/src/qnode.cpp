@@ -78,6 +78,12 @@ void QNode::run() {
 	while ( ros::ok() ) {
 
     msg.c1_b = b_1;
+    msg.c2_b = b_2;
+    msg.c3_b = b_3;
+    msg.c1_t = t_1;
+    msg.c2_t = t_2;
+    msg.c3_t = t_3;
+
     color_pub_.publish(msg);
 		ros::spinOnce();
 		loop_rate.sleep();
