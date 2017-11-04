@@ -44,6 +44,8 @@ private:
   void mapCallBack(nav_msgs::OccupancyGrid map);
   void amclCallBack(geometry_msgs::PoseWithCovarianceStamped msg);
   void pointCallBack(geometry_msgs::PoseWithCovarianceStamped msg);
+  void arucoCallBack(geometry_msgs::PoseWithCovarianceStamped msg);
+
 
   float constrain(float value, float min, float max);
   void getParams();
@@ -55,12 +57,20 @@ private:
   ros::Subscriber route_sub_;
   ros::Subscriber goal_sub_;
   ros::Subscriber point_sub_;
+  ros::Subscriber aruco_sub_;
+
 
   ros::Subscriber map_data_sub_;
   ros::Subscriber map_sub_;
 
   ros::Publisher move_pub_;
   ros::Publisher marker_pub_;
+
+  /*FPB*/
+  ros::Publisher fpb_pub_;
+  geometry_msgs::PoseWithCovarianceStamped fpb_msg_;
+  void fpbCallBack(const ros::TimerEvent& event);
+  ros::Timer fpb_timer_;
 
   ros::Timer position_timer_;
 
@@ -70,6 +80,9 @@ private:
 
   Point2D start_, goal_, next_goal_;
   Pose pose_estimated_, pose_raw_, pose_raw_offset_, pose_offset_, pose_raw_estimated_;
+  /*ARUCO*/
+  Pose pose_aruco_,odom_ekf_0,odom_ekf_1,odom_ekf_diff;
+  /*ARUCO*/
   Point2D xyPose_;
 
   LibAstar* pathFinder_;

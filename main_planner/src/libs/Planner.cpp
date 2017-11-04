@@ -18,8 +18,9 @@ Planner::Planner(ros::NodeHandle* nh)
   pose_estimated_.y = 0.0;
   pose_estimated_.theta = 0;
 
-  pose_raw_.x = 0.0;
-  pose_raw_.y = 0.0;
+
+  pose_raw_.x = 0.2;
+  pose_raw_.y = 0.2;
   pose_raw_.theta = 0;
 
   pose_raw_estimated_.x = 0.0;
@@ -34,11 +35,22 @@ Planner::Planner(ros::NodeHandle* nh)
   pose_offset_.y = 0;
   pose_offset_.theta = 0;
 
+  /*ARUCO*/
+  pose_aruco_.y = 0;
+  pose_aruco_.x = 0;
+  odom_ekf_1.x = 0.2;
+  odom_ekf_1.y = 0.2;
+  /*ARUCO*/
+
+
   point_tolerance_ = 0.02;
   map_resolution_ = 0.02;
 
   Kp_ = 1;
   Kd_ = 0;
+
+  fpb_timer_ = nh_->createTimer(
+      ros::Duration(0.02), &Planner::fpbCallBack, this);
 
   amcl_pose_sub_ = nh_->subscribe<geometry_msgs::PoseWithCovarianceStamped>(
       "/amcl_pose", 1, &Planner::amclCallBack, this);
@@ -53,6 +65,9 @@ Planner::Planner(ros::NodeHandle* nh)
   map_sub_ = nh_->subscribe<nav_msgs::OccupancyGrid>(
       "/map_inflated", 1, &Planner::mapCallBack, this);
 
+  /*FPB*/
+  fpb_pub_ = nh_->advertise<geometry_msgs::PoseWithCovarianceStamped>("/fpb_pub",1);
+
   move_pub_ = nh_->advertise<tcc_msgs::movement_msg>("/cmd_movement", 10);
   // goal_server_ =
   // nh_->advertiseService("/ChangeGoal",&Planner::goalCallBack,this);
@@ -62,6 +77,10 @@ Planner::Planner(ros::NodeHandle* nh)
 
   point_sub_ = nh_->subscribe<geometry_msgs::PoseWithCovarianceStamped>(
       "/initialpose", 1, &Planner::pointCallBack, this);
+
+
+  aruco_sub_ = nh_->subscribe<geometry_msgs::PoseWithCovarianceStamped>(
+      "/fiducial_pose", 1, &Planner::arucoCallBack, this);
 
   static tf::TransformBroadcaster broadcaster;
 
@@ -75,9 +94,9 @@ Planner::Planner(ros::NodeHandle* nh)
       ros::Time::now(), "odom", "base_link"));
 
   broadcaster.sendTransform(tf::StampedTransform(
-      tf::Transform(tf::Quaternion(0, 0, 0.707106, 0.707106),
-                    tf::Vector3(0.0, 0.04, 0.15)),
-      ros::Time::now(), "base_link", "laser"));
+      tf::Transform(tf::createQuaternionFromRPY(-90 * PI / 180, 0 * PI / 180, 0 * PI / 180),
+                    tf::Vector3(0.0, 0.075, 0.10)),
+      ros::Time::now(), "base_link", "camera"));
 
   path_mode_ = 1;
 
@@ -110,7 +129,7 @@ Planner::~Planner()
   route_sub_.shutdown();
 
   move_pub_.shutdown();
-
+  fpb_pub_.shutdown();
   goal_server_.shutdown();
 }
 
@@ -192,14 +211,46 @@ void Planner::pointCallBack(geometry_msgs::PoseWithCovarianceStamped msg)
   ROS_WARN("OFFSET SET");
 }
 
+/*ARUCO*/
+
+void Planner::arucoCallBack(geometry_msgs::PoseWithCovarianceStamped msg)
+{
+
+  pose_aruco_.x = msg.pose.pose.position.x + 0.2;
+  pose_aruco_.y = msg.pose.pose.position.z + 0.2;
+
+  static tf::TransformBroadcaster broadcaster;
+
+  broadcaster.sendTransform(tf::StampedTransform(
+      tf::Transform(tf::createQuaternionFromYaw(0),
+                    tf::Vector3(pose_aruco_.x,
+                                pose_aruco_.y,
+                                0)),
+      ros::Time::now(), "map", "odom_fixed"));
+}
+
+/*ARUCO*/
+
 /**
  * @brief Planner::odometryCallBack
  * @param msg
  */
 void Planner::odometryCallBack(geometry_msgs::PoseWithCovarianceStamped msg)
 {
-  pose_raw_.x = msg.pose.pose.position.x;
-  pose_raw_.y = msg.pose.pose.position.y;
+  /*FPB*/
+  odom_ekf_0.x = msg.pose.pose.position.x;
+  odom_ekf_diff.x = odom_ekf_0.x - odom_ekf_1.x;
+  pose_raw_.x = (pose_raw_.x + odom_ekf_diff.x)*0.99 + pose_aruco_.x*0.01;
+  odom_ekf_1.x = odom_ekf_0.x;
+
+  odom_ekf_0.y = msg.pose.pose.position.y;
+  odom_ekf_diff.y = odom_ekf_0.y - odom_ekf_1.y;
+  pose_raw_.y = (pose_raw_.y + odom_ekf_diff.y)*0.99 + pose_aruco_.y*0.01;
+  odom_ekf_1.y = odom_ekf_0.y;
+
+/*    pose_raw_.x = msg.pose.pose.position.x;
+    pose_raw_.y = msg.pose.pose.position.y;*/
+
   pose_raw_.theta = tf::getYaw(msg.pose.pose.orientation) * 180 / PI;
 
   pose_raw_estimated_.x = pose_raw_.x + pose_raw_offset_.x;
@@ -211,6 +262,11 @@ void Planner::odometryCallBack(geometry_msgs::PoseWithCovarianceStamped msg)
   pose_estimated_.x = pose_raw_estimated_.x + pose_offset_.x;
   pose_estimated_.y = pose_raw_estimated_.y + pose_offset_.y;
   pose_estimated_.theta = pose_raw_estimated_.theta + pose_offset_.theta;
+
+  fpb_msg_.header.stamp = ros::Time::now();
+  fpb_msg_.header.seq++;
+  fpb_msg_.pose.pose.position.x = pose_estimated_.x;
+  fpb_msg_.pose.pose.position.y = pose_estimated_.y;
 
   if (pose_estimated_.theta > 180)
   {
@@ -233,6 +289,12 @@ void Planner::odometryCallBack(geometry_msgs::PoseWithCovarianceStamped msg)
   quat_.setX(msg.pose.pose.orientation.x);
   quat_.setY(msg.pose.pose.orientation.y);
   quat_.setZ(msg.pose.pose.orientation.z);
+}
+
+/**NOVO CALLBACK**/
+void Planner::fpbCallBack(const ros::TimerEvent& event)
+{
+  fpb_pub_.publish(fpb_msg_);
 }
 
 /**
@@ -309,9 +371,9 @@ void Planner::timerCallBack(const ros::TimerEvent& event)
       ros::Time::now(), "odom", "base_link"));
 
   broadcaster.sendTransform(tf::StampedTransform(
-      tf::Transform(tf::createQuaternionFromYaw(90 * PI / 180),
-                    tf::Vector3(0.0, 0.04, 0.10)),
-      ros::Time::now(), "base_link", "laser"));
+      tf::Transform(tf::createQuaternionFromRPY(-90 * PI / 180, 0 * PI / 180, 0 * PI / 180),
+                    tf::Vector3(0.0, 0.075, 0.10)),
+      ros::Time::now(), "base_link", "camera"));
 
   xyPose_.x = pose_estimated_.x;
   xyPose_.y = pose_estimated_.y;
