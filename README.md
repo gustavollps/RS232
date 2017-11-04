@@ -33,3 +33,7 @@ add the line #include <stdlib.h> to /opt/ros/kinetic/include/sensor_msgs/image_e
 then
 
 catkin_make
+
+To run the firmware with the MPU6050 and encoders sensor you should as well add the WiringPi library to your robot's computer. The Odroid C2 library can be found at: https://github.com/hardkernel/wiringPi
+The Raspberry Pi original library at:http://wiringpi.com
+The pins to the encoder sensor are listed inside the file control_loop_master/interrupts/interrupts.cpp
