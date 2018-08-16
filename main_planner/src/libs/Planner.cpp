@@ -38,6 +38,7 @@ Planner::Planner(ros::NodeHandle* nh)
   /*ARUCO*/
   pose_aruco_.y = 0;
   pose_aruco_.x = 0;
+  pose_aruco_.theta = 0;
   odom_ekf_1.x = 0.2;
   odom_ekf_1.y = 0.2;
   /*ARUCO*/
@@ -217,12 +218,13 @@ void Planner::arucoCallBack(geometry_msgs::PoseWithCovarianceStamped msg)
 {
 
   pose_aruco_.x = msg.pose.pose.position.x + 0.2;
-  pose_aruco_.y = msg.pose.pose.position.z + 0.2;
+  pose_aruco_.y = msg.pose.pose.position.y + 0.2;
+  pose_aruco_.theta = tf::getYaw(msg.pose.pose.orientation);
 
   static tf::TransformBroadcaster broadcaster;
 
   broadcaster.sendTransform(tf::StampedTransform(
-      tf::Transform(tf::createQuaternionFromYaw(0),
+      tf::Transform(tf::createQuaternionFromYaw(pose_aruco_.theta),
                     tf::Vector3(pose_aruco_.x,
                                 pose_aruco_.y,
                                 0)),
@@ -240,12 +242,12 @@ void Planner::odometryCallBack(geometry_msgs::PoseWithCovarianceStamped msg)
   /*FPB*/
   odom_ekf_0.x = msg.pose.pose.position.x;
   odom_ekf_diff.x = odom_ekf_0.x - odom_ekf_1.x;
-  pose_raw_.x = (pose_raw_.x + odom_ekf_diff.x)*0.99 + pose_aruco_.x*0.01;
+  pose_raw_.x = (pose_raw_.x + odom_ekf_diff.x);//*0.99 + pose_aruco_.x*0.01;
   odom_ekf_1.x = odom_ekf_0.x;
 
   odom_ekf_0.y = msg.pose.pose.position.y;
   odom_ekf_diff.y = odom_ekf_0.y - odom_ekf_1.y;
-  pose_raw_.y = (pose_raw_.y + odom_ekf_diff.y)*0.99 + pose_aruco_.y*0.01;
+  pose_raw_.y = (pose_raw_.y + odom_ekf_diff.y);//*0.99 + pose_aruco_.y*0.01;
   odom_ekf_1.y = odom_ekf_0.y;
 
 /*    pose_raw_.x = msg.pose.pose.position.x;
