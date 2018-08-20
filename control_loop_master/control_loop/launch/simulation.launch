@@ -1,0 +1,10 @@
+<!--xml-->
+<launch>
+<node name="Control_Loop" pkg="control_loop" type="control_loop" output="screen">
+    <rosparam file="$(find control_loop)/config/control_params.yaml" command="load"/>
+  </node>
+  <node name="map_server" pkg="map_server" type="map_server" args="/home/gustavo/catkin_ws/src/RS232/main_planner/config/map_load.yaml"/>
+  <node name="map_server_inflated" pkg="map_server" type="map_server" args="/home/gustavo/catkin_ws/src/RS232/main_planner/config/map_load_inflated.yaml">
+    <remap from="/map" to="/map_inflated"/>
+  </node>
+</launch>

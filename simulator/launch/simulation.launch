@@ -1,0 +1,56 @@
+<launch>
+  <arg name="amcl_feedback" default="false"/>
+  <arg name="remote_control" default="false"/>
+  <arg name="pose_y" default="0.25"/>
+  <arg name="pose_x" default="0.25"/>
+  <arg name="amcl" default="false" />
+  <arg name="path_mode" default="1" />
+  <arg name="y_gain" default="1" />
+  <arg name="x_gain" default="1" />
+
+
+  <param name="/Main_Planner/amcl_feedback" value="$(arg amcl_feedback)"/>
+  <param name="/Main_Planner/remote_control" value="$(arg remote_control)"/>
+  <param name="/Main_Planner/path_mode" value="$(arg path_mode)"/>
+
+  <node name="Movement_controller" pkg="movement_controller" type="movement_controller">
+    <rosparam file="$(find movement_controller)/config/planner_params.yaml" command="load"/>        
+    <param name="InitialPoseX" value="$(arg pose_x)"/>
+    <param name="InitialPoseY" value="$(arg pose_y)"/>
+    <param name="Xgain" value="$(arg x_gain)"/>
+    <param name="Ygain" value="$(arg y_gain)"/>
+
+  </node>
+
+  
+
+  <node name="Main_Planner" pkg="main_planner" type="main_planner" output="screen">
+    <rosparam file="$(find main_planner)/config/planner_params.yaml" command="load"/>        
+  </node>
+
+  <group if="$(arg amcl)">
+      <node name="urg_node" pkg="urg_node" type="urg_node"/>
+      <node name="amcl" pkg="amcl" type="amcl">
+        <param name="update_min_d" value="0.1"/>
+        <param name="base_frame_id" value="base_link"/>
+        <param name="tf_broadcast" value="false"/>
+        <param name="odom_frame_id" value="odom"/>
+        <param name="odom_model_type" value="omni"/>
+        <param name="initial_pose_x" value="$(arg pose_x)"/>
+        <param name="initial_pose_y" value="$(arg pose_y)"/>
+      </node>
+  </group>
+
+<node name="Control_Loop" pkg="control_loop" type="control_loop" output="screen">
+    <rosparam file="$(find control_loop)/config/control_params.yaml" command="load"/>
+  </node>
+  
+<node name="map_server" pkg="map_server" type="map_server" args="$(find main_planner)/config/map_load.yaml"/>
+
+  <node name="map_server_inflated" pkg="map_server" type="map_server" args="$(find main_planner)/config/map_load_inflated.yaml">
+    <remap from="/map" to="/map_inflated"/>
+  </node>
+
+  <node name="simulator" pkg="simulator" type="simulator_node"></node>
+
+</launch>

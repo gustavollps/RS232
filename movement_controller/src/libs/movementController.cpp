@@ -172,6 +172,7 @@ void movementController::controltimerCallBack(const ros::TimerEvent& event)
   {
     cmd_vel_msg_.angular.z = PID_rotation_->Compute(angle_);
   }
+  ROS_WARN("Set %f\n Angle %f\n Msg %f\n",angle_setpoint_,angle_,cmd_vel_msg_.angular.z);
 
   // Vx acelleration ramps
   if (setpoint_velocity_.Vx >= velocity_msg_.Vx)
@@ -225,12 +226,11 @@ void movementController::controltimerCallBack(const ros::TimerEvent& event)
   if (setpoint_velocity_.Vy == 0 && velocity_.y == 0)
     velocity_msg_.Vy = 0;
 
-#ifdef DEBUG
-  ROS_INFO("\n Setpoint velocity Vx: %f \n Setpoint velocity Vy: %f \n Vx: %f "
-           "\n Vy: %f",
+//#ifdef DEBUG
+  ROS_WARN("\n Setpoint velocity Vx: %f \n Setpoint velocity Vy: %f \n Vx: %f \n Vy: %f",
            setpoint_velocity_.Vx, setpoint_velocity_.Vy, velocity_msg_.Vx,
            velocity_msg_.Vy);
-#endif
+//#endif
 
   cmd_vel_msg_.linear.x = velocity_msg_.Vx;
   cmd_vel_msg_.linear.y = velocity_msg_.Vy;
@@ -335,8 +335,7 @@ void movementController::remotecontrolCallBack(geometry_msgs::Twist msg)
     phi = -phi;
   }
 
-  // ROS_INFO("\nFinal velocity: %f \nVelocity Angle phi: %f \nXg: %f \nYg:
-  // %f",final_velocity, phi,Xg,Yg);
+  ROS_INFO("\nFinal velocity: %f \nVelocity Angle phi: %f \nXg: %f \nYg: %f",final_velocity, phi,Xg,Yg);
 
   double alpha = phi + angle_setpoint_;
 
